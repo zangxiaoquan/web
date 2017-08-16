@@ -9,16 +9,17 @@
 <body> 
     <h1 align="center">中国移动-上线管理系统</h1>
     
-    <form name="fileForm" action="/web/fileUpload" method="post">
+    <form name="fileForm" action="/web/fileExcelPrase" method="post" enctype="multipart/form-data">
     <table  align="center">
     	<tr>
     		<td><lable>生成评审单：</lable></td>
-    		<td><input id="fileText" type="text"></input></td>
-    		<td><input id="fileExcel" type="file" value="上传"></input></td>
-    	</tr>
-    	<tr>
+    		<!--  <td><input id="fileText" type="text"></input></td> -->
+    		<td><input id="fileExcel1" name="fileExcel2" type="file" value="上传"></input></td>
     		<td><input id="fileSubmit" type="submit"></input></td>
     	</tr>
+    	<!--<tr>
+    		<td><input id="fileSubmit" type="submit"></input></td>
+    	</tr>-->
     </table>
     </form>
 </body>
