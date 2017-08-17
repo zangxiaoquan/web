@@ -4,29 +4,51 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script src="js/jquery-1.9.1.min.js"></script>
+<script>
+$().ready(function(){  
+  $("#fileSubmit").click(function()  
+  {  
+      var mydata = '{"fileText":"' + $('#fileText').val() + '"}'; 
+      alert(mydata);    
+      $.ajax(  
+        {    
+            type : 'POST',    
+            contentType : 'application/json',    
+            url : '/web/fileExcelPrase',    
+            processData : false,    
+            dataType : 'json',    
+            data:mydata, 
+            success : function(data)   
+            {    
+                alert("成功");    
+            },    
+            error : function()   
+            {    
+                alert("失败");    
+            }    
+        });    
+  });   
+}); 
+</script>
 <title>首页</title>
 </head>
 <body> 
     <h1 align="center">中国移动-上线管理系统</h1>
     
-    <form name="fileForm" action="/web/fileExcelPrase" method="post" enctype="multipart/form-data">
-    <table  align="center">
+    <!--<form name="fileForm" action="/web/fileExcelPrase" method="post">-->
+    <!--  enctype="multipart/form-data"> -->
+    <!--<table  align="center">-->
     	<tr>
     		<td><lable>生成评审单：</lable></td>
-    		<!--  <td><input id="fileText" type="text"></input></td> -->
-    		<td><input id="fileExcel1" name="fileExcel2" type="file" value="上传"></input></td>
-    		<td><input id="fileSubmit" type="submit"></input></td>
+    		<td><input id="fileText" type="text"></input></td>
+    		<!--<td><input id="fileExcel1" name="fileExcel2" type="file" value="上传"></input></td> -->
+    		<td><input id="fileSubmit" type="button" value="生成"></input></td>
     	</tr>
     	<!--<tr>
     		<td><input id="fileSubmit" type="submit"></input></td>
     	</tr>-->
-    </table>
-    </form>
+    <!--</table>-->
+    <!--</form>-->
 </body>
-<script type="text/javascript">
-function setFilename(){
-    var fileName = document.getElementById("fileExcel").value;
-    document.getElementById("fileText").value=fileName;
-}
-</script>
 </html>
