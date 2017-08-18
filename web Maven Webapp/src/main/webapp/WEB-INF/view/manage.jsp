@@ -6,30 +6,13 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <script src="js/jquery-1.9.1.min.js"></script>
 <script>
-$().ready(function(){  
-  $("#fileSubmit").click(function()  
-  {  
-      var mydata = '{"fileText":"' + $('#fileText').val() + '"}'; 
-      alert(mydata);    
-      $.ajax(  
-        {    
-            type : 'POST',    
-            contentType : 'application/json',    
-            url : '/web/fileExcelPrase',    
-            processData : false,    
-            dataType : 'json',    
-            data:mydata, 
-            success : function(data)   
-            {    
-                alert("成功");    
-            },    
-            error : function()   
-            {    
-                alert("失败");    
-            }    
-        });    
-  });   
-}); 
+$(function(){
+              $("#fileSubmit").click(function(){
+                  $.post("/web/fileExcelPrase",{name:$("#fileText").val()},function(data){
+                      alert(data);
+                  });
+              });
+          });
 </script>
 <title>首页</title>
 </head>
@@ -38,7 +21,7 @@ $().ready(function(){
     
     <!--<form name="fileForm" action="/web/fileExcelPrase" method="post">-->
     <!--  enctype="multipart/form-data"> -->
-    <!--<table  align="center">-->
+    <table  align="center">
     	<tr>
     		<td><lable>生成评审单：</lable></td>
     		<td><input id="fileText" type="text"></input></td>
@@ -48,7 +31,7 @@ $().ready(function(){
     	<!--<tr>
     		<td><input id="fileSubmit" type="submit"></input></td>
     	</tr>-->
-    <!--</table>-->
+    </table>
     <!--</form>-->
 </body>
 </html>
