@@ -8,7 +8,8 @@
 <script>
 $(function(){
               $("#fileSubmit").click(function(){
-                  $.post("/web/fileExcelPrase",{name:$("#fileText").val()},function(data){
+              var str = $("#fileText").val();
+                  $.post("/web/fileExcelPrase",{name:str},function(data){
                       alert(data);
                   });
               });
