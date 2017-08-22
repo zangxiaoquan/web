@@ -14,6 +14,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.Region;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFPrintSetup;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -38,7 +39,6 @@ public class ExcelFileService {
 		      if(xssfSheet == null||!xssfSheet.getSheetName().equals(dealSheetName)){  
 		        continue;  
 		      }
-		      System.out.print(xssfSheet.getLastRowNum()+"\n");
 		      // 循环行Row   
 		      for(int rowNum = 0; rowNum <= xssfSheet.getLastRowNum(); rowNum++){  
 		        XSSFRow xssfRow = xssfSheet.getRow( rowNum);  
@@ -55,9 +55,9 @@ public class ExcelFileService {
 		          rowmap.put(String.valueOf(xssfCell.getColumnIndex()),xssfCell.toString()==null?"":xssfCell.toString());
 		        } 
 		        sheetmap.put(String.valueOf(rowNum) , rowmap);
-		        System.out.println("    " + sheetmap);  
 		      }  
 		    }
+		    System.out.print(sheetmap.get("46"));
 		is.close();
 		return sheetmap;  
 	  }  
@@ -70,19 +70,23 @@ public class ExcelFileService {
 			    // 循环工作表Sheet  
 			    for(int numSheet = 0; numSheet < xssfWorkbook.getNumberOfSheets(); numSheet++){  
 			      XSSFSheet xssfSheet = xssfWorkbook.getSheetAt( numSheet);
+			      //设置打印横向
+			      XSSFPrintSetup xssprint = xssfSheet.getPrintSetup();
+			      xssprint.setLandscape(true);
+			      //设置A4纸
+			      xssprint.setPaperSize(XSSFPrintSetup.A4_PAPERSIZE);
+
 			      if(excelFileMap.get(String.valueOf(numSheet+2))!=null && !excelFileMap.get(String.valueOf(numSheet+2)).equals("")){
 			    	  xssfWorkbook.cloneSheet(numSheet);
 				      xssfWorkbook.setSheetName(numSheet+1,"Sheet"+String.valueOf(numSheet+2));
-				      System.out.print("Sheet"+String.valueOf(numSheet+2));
 			      }
 			      
 			      if(xssfSheet == null||!xssfSheet.getSheetName().equals("Sheet"+String.valueOf(numSheet+1))){  
 			        continue;  
 			      }
-			        System.out.print(xssfSheet.getLastRowNum());
 			      // 循环行Row   
 			      for(int rowNum = 0; rowNum <= xssfSheet.getLastRowNum(); rowNum++){  
-			        XSSFRow xssfRow = xssfSheet.getRow( rowNum);  
+			        XSSFRow xssfRow = xssfSheet.getRow(rowNum);  
 			        if(xssfRow == null||xssfRow.getRowNum()==0 || xssfRow.getRowNum()==2){  
 			          continue;  
 			        } 
@@ -99,33 +103,35 @@ public class ExcelFileService {
 			        	  }
 			          //需求名称
 			          if(rowNum==1 && cellNum==0){
-			        	  xssfCell.setCellValue("需求名称："+excelFileMap.get(String.valueOf(numSheet+1)).get("4"));
+			        	  String Str = excelFileMap.get(String.valueOf(numSheet+1)).get("4");
+			        	  xssfCell.setCellValue("需求名称："+(Str==null?"":Str));
 			        	  continue;
 				        }
 			          //需求id
 			          if(rowNum==1 && cellNum==2){
-			        	  xssfCell.setCellValue("需求ID："+excelFileMap.get(String.valueOf(numSheet+1)).get("1"));
+			        	  String Str = excelFileMap.get(String.valueOf(numSheet+1)).get("1");
+			        	  xssfCell.setCellValue("需求ID："+(Str==null?"":Str));
 			        	  continue;
 				        }
 			          //需求负责人
 			          if((rowNum==3 || rowNum==10 || rowNum==11 || rowNum==12) && cellNum==3){
-			        	  String tmpStr = xssfCell.toString();
-			        	  xssfCell.setCellValue((tmpStr.equals("")?tmpStr:tmpStr+"、")+excelFileMap.get(String.valueOf(numSheet+1)).get("9"));
+			        	  String finalStr = getCellValue(xssfCell,excelFileMap,numSheet);
+			        	  xssfCell.setCellValue(finalStr);
 				        }
 			          //开发
 			          if((rowNum==4 || rowNum==5 || rowNum==6 || rowNum==9) && cellNum==3){
-			        	  String tmpStr = xssfCell.toString();
-			        	  xssfCell.setCellValue((tmpStr.equals("")?tmpStr:tmpStr+"、")+excelFileMap.get(String.valueOf(numSheet+1)).get("10"));
+			        	  String finalStr = getCellValue(xssfCell,excelFileMap,numSheet);
+			        	  xssfCell.setCellValue(finalStr);
 				        }
 			          //测试
 			          if((rowNum==6 || rowNum==7 || rowNum==8 || rowNum==9) && cellNum==3){
-			        	  String tmpStr = xssfCell.toString();
-			        	  xssfCell.setCellValue((tmpStr.equals("")?tmpStr:tmpStr+"、")+excelFileMap.get(String.valueOf(numSheet+1)).get("11"));
+			        	  String finalStr = getCellValue(xssfCell,excelFileMap,numSheet);
+			        	  xssfCell.setCellValue(finalStr);
 				        }
 			          //局方需求负责人
 			          if((rowNum==12 || rowNum==13 || rowNum==14) && cellNum==3){
-			        	  String tmpStr = xssfCell.toString();
-			        	  xssfCell.setCellValue((tmpStr.equals("")?tmpStr:tmpStr+"、")+excelFileMap.get(String.valueOf(numSheet+1)).get("7"));
+			        	  String finalStr = getCellValue(xssfCell,excelFileMap,numSheet);
+			        	  xssfCell.setCellValue(finalStr);
 				        }
 			        } 
 			      } 
@@ -135,6 +141,18 @@ public class ExcelFileService {
                 out.close();
                 is.close();
                 return true;
+	}
+	private String getCellValue(XSSFCell xssfCell,Map<String, Map<String, String>> excelFileMap,int numSheet){
+	  String tmpStr = xssfCell.toString();
+  	  String Str = excelFileMap.get(String.valueOf(numSheet+1)).get("9");
+  	  String finalStr = "";
+  	  if(tmpStr != null && !tmpStr.equals("")  && Str != null && !Str.equals("")){
+  		  finalStr = tmpStr+"、"+Str;
+  	  }
+  	  else{
+  		  finalStr = (tmpStr==null?"":tmpStr)+(Str==null?"":Str);
+  	  }
+  	  return finalStr;
 	}
 //	  @SuppressWarnings("static-access")  
 //	  private String getValue(HSSFCell hssfCell){  
