@@ -20,13 +20,16 @@ import com.excel.util.stringUtil;
 @Service
 public class ExcelFileService {
 	Map<String, String> rowmap ;
-	List<Map<String, String>> sheetList = new ArrayList<Map<String,String>>();
+	List<Map<String, String>> sheetList;
 	InputStream is =  null;
 	FileOutputStream out = null;
 	
-	public List<Map<String, String>> excelFilePrase(String file,String dealSheetName) throws IOException{  
+	public List<Map<String, String>> excelFilePrase(String file,String dealSheetName) throws IOException{ 
+		System.out.print("-------开始解析Excel-------"+System.getProperty("line.separator"));
+		//每次new一个对象防止连续调用list内容持续增加，不释放问题
+		sheetList = new ArrayList<Map<String,String>>();
 		is = new FileInputStream(file); 
-		file=file.toLowerCase();
+		file=file.toLowerCase();//防止文件尾缀大小写错乱
 			XSSFWorkbook xssfWorkbook = new XSSFWorkbook(is);
 		    // 循环工作表Sheet  
 		    for(int numSheet = 0; numSheet < xssfWorkbook.getNumberOfSheets(); numSheet++){  
@@ -52,18 +55,18 @@ public class ExcelFileService {
 		        sheetList.add(rowmap);
 		      }  
 		    }
-		    System.out.print(sheetList.size());
 		is.close();
+		System.out.print("-------解析完毕共解析"+sheetList.size()+"行-------"+System.getProperty("line.separator"));
 		return sheetList;  
 	  }  
 	  
 	  
-	public boolean excelFileGenerate(String file,List<Map<String, String>> excelFileList) throws IOException{  
-			//
+	public String excelFileGenerate(String file,List<Map<String, String>> excelFileList) throws IOException{  
+			//防止文件尾缀大小写错乱
 			file=file.toLowerCase();
 			is = new FileInputStream(file); 
 			XSSFWorkbook xssfWorkbook = new XSSFWorkbook(is);
-			
+			//迭代上线列表
 			Iterator<Map<String, String>> iterator = excelFileList.iterator();
 			int i = 0;
 			while(iterator.hasNext()){
@@ -79,11 +82,15 @@ public class ExcelFileService {
 			    xssprint.setLandscape(true);
 			    //设置A4纸
 			    xssprint.setPaperSize(XSSFPrintSetup.A4_PAPERSIZE);
-				//如果还有就继续clone
-				xssfWorkbook.cloneSheet(i-1);
-			    xssfWorkbook.setSheetName(i,"Sheet"+String.valueOf(i+1));
 			    
-				Map<String, String> tmpMap = iterator.next();
+			    //取第i+1行数据
+			    Map<String, String> tmpMap = iterator.next();
+				//如果还有就继续clone
+			    if(iterator.hasNext()){
+			    	xssfWorkbook.cloneSheet(i-1);
+				    xssfWorkbook.setSheetName(i,"Sheet"+String.valueOf(i+1));
+			    }
+				
 				//需求名称
 				String demandName = tmpMap.get("4");
 				xssfSheet.getRow(1).getCell(0).setCellValue("需求名称："+(demandName==null?"":demandName));
@@ -119,7 +126,7 @@ public class ExcelFileService {
 			    xssfWorkbook.write(out);
                 out.close();
                 is.close();
-                return true;
+                return "共生成"+(i-1)+"个评审单";
 	}
 	private String getCellValue(String str1,String str2){
   	  String finalStr = "";
