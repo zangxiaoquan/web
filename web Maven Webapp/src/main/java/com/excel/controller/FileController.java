@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
+import javax.swing.filechooser.FileSystemView;
+
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -19,7 +21,7 @@ public class FileController {
 	@Autowired
 	private ExcelFileService excelFileService;
 	private List<Map<String, String>> excelFileList;
-	private String destFilePath = "C:\\Users\\zq\\Desktop\\";//生成评审单路径
+	private String destFilePath = null;//生成评审单路径
 	
 	@RequestMapping("/fileExcelPrase4Jq")
 	@ResponseBody
@@ -31,6 +33,11 @@ public class FileController {
 	        excelFileList = excelFileService.excelFilePrase(excelFilePath,"上线清单");
 	        //获取评审单模版路径
 	        String orgFilePath = request.getSession().getServletContext().getRealPath("/")+"template\\lnyd_check4allplat.xlsx";
+	        //获取桌面路径
+//	        File desktopDir = FileSystemView.getFileSystemView().getHomeDirectory();
+//	        destFilePath = desktopDir.getAbsolutePath()+"\\";
+	        destFilePath = request.getSession().getServletContext().getRealPath("/");
+	        destFilePath = destFilePath.substring(0, destFilePath.indexOf("apache"));
 	        //从模版路径复制一个到桌面并使用其生成评审单
 	        FileUtils.copyFileToDirectory(new File(orgFilePath), new File(destFilePath));
 	        //生成评审单
