@@ -15,7 +15,7 @@ public class HelloController {
 	
     @RequestMapping("/index")
     public String index(){
-        return "manage";
+        return "login";
     }
     
     @RequestMapping(value = "login", method = RequestMethod.GET)
